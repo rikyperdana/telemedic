@@ -66,7 +66,28 @@ m.mount(document.body, mitGen({
     name: 'user', full: 'User Menu',
     comp: () => m('h1', 'User Profile'),
     submenu: {
-      login: {full: 'Sign In/Up', icon: 'sign-in-alt'},
+      login: {
+        full: 'Sign In/Up', icon: 'sign-in-alt',
+        comp: () => m('.columns',
+          m('.column'),
+          m('.column',
+            _.range(3).map(i => m('br')),
+            m('.level', m('.level-item.has-text-centered',
+              m('span.icon.is-large.has-text-primary', m('i.fas.fa-8x.fa-stethoscope'))
+            )), m('br'),
+            m(autoForm({
+              id: 'loginForm',
+              schema: {
+                username: {type: String},
+                password: {type: String, autoform: {type: 'password'}}
+              },
+              submit: {value: 'Login'},
+              action: doc => poster('/login', doc, console.log)
+            }))
+          ),
+          m('.column')
+        )
+      },
       profile: {
         icon: 'address-card',
         comp: () => m('h1', 'My Profile')
