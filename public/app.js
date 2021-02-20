@@ -3,7 +3,12 @@ daftarKlinik = ['penyakit_dalam', 'anak', 'obgyn', 'bedah', 'gigi', 'umum'],
 
 randomId = () => [1, 1].map(() =>
   Math.random().toString(36).slice(2)
-).join('')
+).join(''),
+
+poster = (url, obj, cb) => fetch(url, {
+  method: 'POST', body: JSON.stringify(obj),
+  headers: {'Content-Type': 'application/json'}
+}).then(res => res.json()).then(cb)
 
 m.mount(document.body, mitGen({
   brand: { // only have 1 menu

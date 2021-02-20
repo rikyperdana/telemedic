@@ -1,9 +1,16 @@
 var
-dotenv = require('dotenv'),
+dotenv = require('dotenv').config(),
 express = require('express'),
 mongodb = require('mongodb'),
-bcryp = require('bcrypt')
+bcrypt = require('bcrypt')
 
-app = express()
-.use(express.static('public'))
-.listen(3000)
+mongodb.MongoClient.connect(
+  process.env.MONGO,
+  {useNewUrlParser: true, useUnifiedTopology: true},
+  (err, client) => err ? console.log(err) :
+    express()
+    .use(express.static('public'))
+    .post('/login', (req, res) => res.send({a: 1}))
+    .listen(3000)
+)
+
