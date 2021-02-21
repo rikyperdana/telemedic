@@ -8,15 +8,18 @@ randomId = () => [1, 1].map(() =>
 poster = (url, obj, cb) => fetch(url, {
   method: 'POST', body: JSON.stringify(obj),
   headers: {'Content-Type': 'application/json'}
-}).then(res => res.json()).then(cb)
+}).then(res => res.json()).then(cb),
 
-m.mount(document.body, mitGen({
+menus = {
   brand: { // only have 1 menu
     name: 'home', full: 'SIMRS.dev',
     // comp: () => m('h1', 'Home')
   },
   start: { // may have menus of menus
-    telemedic: {icon: 'headset', comp: () => [
+    telemedic: {icon: 'headset', comp: () =>
+    !JSON.parse(localStorage.login || '{}')._id
+    ? [mgState.comp = menus.end.submenu.login.comp, m.redraw()]
+    : [
       m('h2', 'Riwayat Telemedic'),
       m('.button.is-info',
         {onclick: () => [
@@ -85,6 +88,7 @@ m.mount(document.body, mitGen({
               action: doc => poster('/login', doc, res =>
                 res.error ? alert(_.startCase(res.error)) : [
                   localStorage.setItem('login', JSON.stringify(res)),
+                  mgState.comp = menus.start.telemedic.comp,
                   m.redraw()
                 ]
               )
@@ -101,6 +105,6 @@ m.mount(document.body, mitGen({
       logout: {icon: 'sign-out-alt'}
     }
   },
-}, {
-  theme: 'united'
-}))
+}
+
+m.mount(document.body, mitGen(menus, {theme: 'united'}))
