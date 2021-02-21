@@ -15,7 +15,11 @@ mongodb.MongoClient.connect(
     .use(express.static('public'))
     .use(bodyParser.json())
     .post('/login', (req, res) => db.collection('patients').findOne(
-      {}, (err, patient) => patient && res.send(patient)
+      {'identitas.kredensial.username': req.body.username},
+      (err, patient) => patient && bcrypt.compare(
+        req.body.password, patient.identitas.kredensial.password,
+        (err, result) => res.send(result ? patient : {error: 'password salah'})
+      )
     ))
     .listen(3000)
   )

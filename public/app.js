@@ -82,7 +82,12 @@ m.mount(document.body, mitGen({
                 password: {type: String, autoform: {type: 'password'}}
               },
               submit: {value: 'Login'},
-              action: doc => poster('/login', doc, console.log)
+              action: doc => poster('/login', doc, res =>
+                res.error ? alert(_.startCase(res.error)) : [
+                  localStorage.setItem('login', JSON.stringify(res)),
+                  m.redraw()
+                ]
+              )
             }))
           ),
           m('.column')
