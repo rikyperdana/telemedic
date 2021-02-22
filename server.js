@@ -21,6 +21,10 @@ mongodb.MongoClient.connect(
         (err, result) => res.send(result ? patient : {error: 'password salah'})
       )
     ))
+    .post('/updatePatient', (req, res) => db.collection('patients').updateOne(
+      {_id: req.body._id}, {$set: req.body},
+      (err, suc) => res.send(suc || {error: 'gagal update'})
+    ))
     .listen(3000)
   )
 )

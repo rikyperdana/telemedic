@@ -26,7 +26,7 @@ menus = {
           state.modalRequestTelemed = m('.box',
             m('h4', 'Form permintaan daring Dokter'),
             m(autoForm({
-              id: 'formRequestTelemed', action: console.log,
+              id: 'formRequestTelemed',
               layout: {top: [
                 ['klinik', 'dokter'],
                 ['pesan'], ['darurat'],
@@ -55,7 +55,11 @@ menus = {
                   autoform: {type: 'hidden'},
                   autoValue: () => _.now()
                 }
-              }
+              },
+              action: doc => poster('/updatePatient', withThis(
+                JSON.parse(localStorage.login),
+                patient => _.assign(patient, {telemed: [...patient.telemed, doc]})
+              ), res => res && console.log(res))
             }))
           ),
           m.redraw()
@@ -64,6 +68,7 @@ menus = {
       ),
       makeModal('modalRequestTelemed')
     ]},
+    outpatient: {full: 'Rawat Jalan', icon: 'walking'},
     riwayat: {full: 'Riwayat Kunjungan', icon: 'book-medical'},
     dokter: {full: 'Daftar Dokter', icon: 'user-md'},
     profil: {full: 'Update Profil', icon: 'id-card'}
