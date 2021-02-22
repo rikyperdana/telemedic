@@ -20,7 +20,11 @@ menus = {
     !JSON.parse(localStorage.login || '{}')._id
     ? [mgState.comp = menus.end.submenu.login.comp, m.redraw()]
     : [
-      m('h2', 'Riwayat Telemedic'),
+      m('h2', {
+        oncreate: () => poster('/dokterList', {}, res => [
+          state.dokterList = res.res, m.redraw()
+        ])
+      }, 'Riwayat Telemedic'),
       m('.button.is-info',
         {onclick: () => [
           state.modalRequestTelemed = m('.box',
@@ -38,7 +42,11 @@ menus = {
                     (val, key) => ({value: key+1, label: _.startCase(val)})
                   )
                 }},
-                dokter: {type: String},
+                dokter: {type: String, autoform: {
+                  type: 'select', options: () => state.dokterList.map(
+                    i => ({value: i._id, label: i.nama})
+                  )
+                }},
                 pesan: {type: String, autoform: {type: 'textarea'}},
                 darurat: {type: Number, autoform: {
                   type: 'select', options: () => [
@@ -58,7 +66,10 @@ menus = {
               },
               action: doc => poster('/updatePatient', withThis(
                 JSON.parse(localStorage.login),
-                patient => _.assign(patient, {telemed: [...patient.telemed, doc]})
+                patient => _.assign(patient, {
+                  telemed: [...patient.telemed, doc],
+                  updated: _.now()
+                })
               ), res => res && console.log(res))
             }))
           ),
