@@ -15,7 +15,10 @@ mongodb.MongoClient.connect(
     .use(express.static('public'))
     .use(bodyParser.json())
     .post('/login', (req, res) => db.collection('patients').findOne(
-      {'identitas.kredensial.username': req.body.username},
+      {
+        'identitas.kredensial.username': req.body.username,
+        'identitas.kredensial.keaktifan': 1
+      },
       (err, patient) => patient && bcrypt.compare(
         req.body.password, patient.identitas.kredensial.password,
         (err, result) => res.send(result ? patient : {error: 'password salah'})
