@@ -26,7 +26,6 @@ mongodb.MongoClient.connect(
       (err, suc) => res.send(suc || {error: 'gagal update'})
     ))
     .post('/dokterList', (req, res) =>
-      [console.log('terpanggil')] &&
       db.collection('users').find({peranan: 3})
       .toArray((err, array) => res.send({res: array}))
     )

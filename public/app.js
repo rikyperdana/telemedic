@@ -17,7 +17,7 @@ menus = {
   },
   start: { // may have menus of menus
     telemedic: {icon: 'headset', comp: () =>
-    !JSON.parse(localStorage.login || '{}')._id
+    !JSON.parse(localStorage.patient || '{}')._id
     ? [mgState.comp = menus.end.submenu.login.comp, m.redraw()]
     : [
       m('h2', {
@@ -25,7 +25,13 @@ menus = {
           state.dokterList = res.res, m.redraw()
         ])
       }, 'Riwayat Telemedic'),
-      m('.button.is-info',
+      withThis(
+        _.last(_.get(JSON.parse(localStorage.patient), 'telemed')),
+        last => ors([ // munculkan kalau request terakhir:
+          last.soapDokter, // sudah ada soapDokternya
+          last.konfirmasi === 2 // ditolak pendaftaran
+        ])
+      ) && m('.button.is-info',
         {onclick: () => [
           state.modalRequestTelemed = m('.box',
             m('h4', 'Form permintaan daring Dokter'),
@@ -64,13 +70,19 @@ menus = {
                   autoValue: () => _.now()
                 }
               },
-              action: doc => poster('/updatePatient', withThis(
-                JSON.parse(localStorage.login),
-                patient => _.assign(patient, {
-                  telemed: [...patient.telemed, doc],
-                  updated: _.now()
-                })
-              ), res => res && console.log(res))
+              action: doc => poster('/updatePatient',
+                withThis(
+                  JSON.parse(localStorage.patient),
+                  patient => _.assign(patient, {
+                    telemed: [...(patient.telemed || []), doc],
+                    updated: _.now()
+                  })
+                ),
+                res => res && [
+                  state.modalRequestTelemed = null,
+                  m.redraw()
+                ]
+              )
             }))
           ),
           m.redraw()
@@ -106,7 +118,7 @@ menus = {
               submit: {value: 'Login'},
               action: doc => poster('/login', doc, res =>
                 res.error ? alert(_.startCase(res.error)) : [
-                  localStorage.setItem('login', JSON.stringify(res)),
+                  localStorage.setItem('patient', JSON.stringify(res)),
                   mgState.comp = menus.start.telemedic.comp,
                   m.redraw()
                 ]
