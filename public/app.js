@@ -10,6 +10,17 @@ poster = (url, obj, cb) => fetch(url, {
   headers: {'Content-Type': 'application/json'}
 }).then(res => res.json()).then(cb),
 
+tds = array =>
+  array.map(i => m('td', i)),
+
+hari = (timestamp, hour) =>
+  timestamp && moment(timestamp)
+  .format('Do MMMM YYYY'+(hour ? ', hh:mm' : '')),
+
+lookUser = id =>
+  !id ? '-' : _.get((state.dokterList || [])
+  .find(i => i._id === id), 'nama') || '-',
+
 menus = {
   brand: { // only have 1 menu
     name: 'home', full: 'SIMRS.dev',
@@ -25,13 +36,14 @@ menus = {
           state.dokterList = res.res, m.redraw()
         ])
       }, 'Riwayat Telemedic'),
-      withThis(
+      !withThis(
         _.last(_.get(JSON.parse(localStorage.patient), 'telemed')),
         last => ors([ // munculkan kalau request terakhir:
           last.soapDokter, // sudah ada soapDokternya
           last.konfirmasi === 2 // ditolak pendaftaran
         ])
-      ) && m('.button.is-info',
+      ) ? m('p.help', '* Menunggu respon rumah sakit')
+      : m('.button.is-info',
         {onclick: () => [
           state.modalRequestTelemed = m('.box',
             m('h4', 'Form permintaan daring Dokter'),
@@ -89,7 +101,16 @@ menus = {
         ]},
         makeIconLabel('plus', 'Request Telemedik')
       ),
-      makeModal('modalRequestTelemed')
+      makeModal('modalRequestTelemed'), m('br'), m('br'),
+      m('.box', m('.table-container', m('table.table',
+        m('thead', m('tr', ['Tanggal', 'Dokter'].map(i => m('th', i)))),
+        m('tbody', withThis(
+          _.get(JSON.parse(localStorage.patient), 'telemed'),
+          telemedList => telemedList.map(i => m('tr', tds([
+            hari(i.tanggal, true), lookUser(_.get(i, 'soapDokter.dokter'))
+          ])))
+        ))
+      )))
     ]},
     outpatient: {full: 'Rawat Jalan', icon: 'walking'},
     riwayat: {full: 'Riwayat Kunjungan', icon: 'book-medical'},
