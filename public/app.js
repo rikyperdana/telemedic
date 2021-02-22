@@ -60,10 +60,13 @@ menus = {
           ),
           m.redraw()
         ]},
-        makeIconLabel('plus', 'Request Dokter')
+        makeIconLabel('plus', 'Request Telemedik')
       ),
       makeModal('modalRequestTelemed')
-    ]}
+    ]},
+    riwayat: {full: 'Riwayat Kunjungan', icon: 'book-medical'},
+    dokter: {full: 'Daftar Dokter', icon: 'user-md'},
+    profil: {full: 'Update Profil', icon: 'id-card'}
   },
   end: { // may have 1 submenu menu
     name: 'user', full: 'User Menu',
