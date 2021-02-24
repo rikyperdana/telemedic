@@ -32,7 +32,7 @@ mongodb.MongoClient.connect(
       db.collection('users').find({peranan: 3})
       .toArray((err, array) => res.send({res: array}))
     )
-    .listen(3000)
+    .listen(process.env.PORT || 3200)
   )
 )
 

@@ -15,10 +15,10 @@ var menus = {
       }, 'Riwayat Telemedic'),
       !withThis(
         _.last(_.get(JSON.parse(localStorage.patient), 'telemed')),
-        last => ors([ // munculkan kalau request terakhir:
+        last => last ? ors([ // munculkan kalau request terakhir:
           last.soapDokter, // sudah ada soapDokternya
           last.konfirmasi === 2 // ditolak pendaftaran
-        ])
+        ]) : true
       ) ? m('p.help', '* Menunggu respon rumah sakit')
       : m('.button.is-info',
         {onclick: () => [
@@ -83,8 +83,8 @@ var menus = {
         m('thead', m('tr', ['Tanggal', 'Dokter'].map(i => m('th', i)))),
         m('tbody', withThis(
           _.get(JSON.parse(localStorage.patient), 'telemed'),
-          telemedList => telemedList.map(i => m('tr', tds([
-            hari(i.tanggal, true), lookUser(_.get(i, 'soapDokter.dokter'))
+          telemedList => (telemedList || []).map(i => m('tr', tds([
+            hari(i.request, true), lookUser(_.get(i, 'soapDokter.dokter'))
           ])))
         ))
       )))
@@ -131,7 +131,10 @@ var menus = {
         comp: () => m('h1', 'My Profile')
       },
       subs: {full: 'Subscription', icon: 'rss'},
-      logout: {icon: 'sign-out-alt'}
+      logout: {icon: 'sign-out-alt', comp: () => [
+        localStorage.removeItem('patient'),
+        m.redraw()
+      ]}
     }
   },
 }
