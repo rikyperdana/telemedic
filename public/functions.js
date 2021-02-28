@@ -20,3 +20,4 @@ hari = (timestamp, hour) =>
 lookUser = id =>
   !id ? '-' : _.get((state.dokterList || [])
   .find(i => i._id === id), 'nama') || '-'
+

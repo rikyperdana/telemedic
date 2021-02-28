@@ -59,6 +59,7 @@ var menus = {
                   autoValue: () => _.now()
                 }
               },
+              confirmMessage: 'Yakin untuk kirimkan ke pasien?',
               action: doc => poster('/updatePatient',
                 withThis(
                   JSON.parse(localStorage.patient),
@@ -80,13 +81,34 @@ var menus = {
       ),
       makeModal('modalRequestTelemed'), m('br'), m('br'),
       m('.box', m('.table-container', m('table.table',
-        m('thead', m('tr', ['Tanggal', 'Dokter'].map(i => m('th', i)))),
+        m('thead', m('tr', ['Tanggal', 'DPJP'].map(i => m('th', i)))),
         m('tbody', withThis(
           _.get(JSON.parse(localStorage.patient), 'telemed'),
-          telemedList => (telemedList || []).map(i => m('tr', tds([
-            hari(i.request, true), lookUser(_.get(i, 'soapDokter.dokter'))
-          ])))
-        ))
+          telemedList => (telemedList || []).map(i => m('tr',
+            {onclick: () => [
+              state.modalRincianTelemed = m('.box',
+                m('h4', 'Rincian Telemed'),
+                m('.table-container', m('table.table',
+                  [
+                    ['Konfirmasi', i.konfirmasi === 1 ? 'Diterima' : 'Ditolak'],
+                    ['Jadwal live', hari(i.tanggal, true)],
+                    ['Keterangan', i.keterangan],
+                    ['Klinik', daftarKlinik[i.klinik - 1]],
+                    ['Dokter diminta', lookUser(i.dokter)],
+                  ].map(j => m('tr', m('th', j[0]), m('td', j[1])))
+                )),
+                ands([i.link, _.now() > i.tanggal, !i.soapDokter]) &&
+                m('.button.is-primary', m('a',
+                  {href: i.link, target: '_blank', style: 'color: inherit'},
+                  makeIconLabel('headset', 'Join live')
+                ))
+              ),
+              m.redraw()
+            ]},
+            tds([hari(i.request, true), lookUser(_.get(i, 'soapDokter.dokter'))])
+          ))
+        )),
+        makeModal('modalRincianTelemed')
       )))
     ]},
     outpatient: {full: 'Rawat Jalan', icon: 'walking'},
